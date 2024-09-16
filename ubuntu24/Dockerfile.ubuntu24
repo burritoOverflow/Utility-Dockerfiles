@@ -1,0 +1,39 @@
+FROM ubuntu:noble-20240801
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# libssl-dev is the minimal dependency we need for building python3 from source via pyenv (lzma bzip readline curses libffi etc will show as warnings; add as needed)
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    wget \
+    vim \
+    git \
+    cmake \
+    python3-pip \
+    libssl-dev \ 
+ninja-build
+
+# use pyenv to get python3.12 and set as global
+RUN git clone --depth=1 https://github.com/pyenv/pyenv.git .pyenv
+
+ENV PYENV_ROOT="${HOME}/.pyenv"
+ENV PATH="${PYENV_ROOT}/shims:${PYENV_ROOT}/bin:${PATH}"
+
+ENV PYTHON_VERSION=3.12
+RUN pyenv install ${PYTHON_VERSION} --verbose
+RUN pyenv global ${PYTHON_VERSION}
+
+# verify set correctly
+RUN which python3
+RUN python3 --version
+
+RUN python3 -m pip install -U "yt-dlp[default]"
+
+COPY pyenvBinsToPath.sh addbins.sh
+
+# this is pointless here apparently, but i'll leave it for reference
+# need to source this to change the PATH when running the container manually
+CMD source addbins.sh
+
+CMD ["uname", "-a"]
