@@ -1,11 +1,26 @@
 FROM archlinux:base-devel
 
-# List installed
 RUN pacman -Q
 
-# update
 RUN pacman -Syu --noconfirm
 
-RUN pacman -S --noconfirm zsh neovim vim git cmake ninja gn yt-dlp pyenv
+# all sorts of fun and rice.
+RUN pacman -S --noconfirm curl zsh neovim vim git cmake ninja gn yt-dlp pyenv fish fastfetch zoxide bat ripgrep fzf
+
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+RUN echo 'eval "$(zoxide init zsh)"' >>~/.zshrc
+
+RUN echo 'source <(fzf --zsh)' >>~/.zshrc
+
+RUN mkdir -p /root/.config/fish
+
+RUN echo "fzf --fish | source" >>~/.config/fish/config.fish
+
+RUN curl https://raw.githubusercontent.com/oh-my-fish/oh-my-fish/master/bin/install >omfinstall
+
+RUN fish omfinstall --path=~/.local/share/omf --config=~/.config/omf --noninteractive
+
+RUN rm omfinstall
 
 CMD ["uname", "-a"]

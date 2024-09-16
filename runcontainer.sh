@@ -6,7 +6,16 @@ does_exist() {
 
 usage() {
     echo "Usage: $0 [-v volume] [-i image] [-l localpath ] [-h (help)]"
+}
 
+strip_trailing_slash_if_present() {
+    local input="$1"
+
+    if [[ "$input" == */ ]]; then
+        echo "${input%/}"
+    else
+        echo "$input"
+    fi
 }
 
 # this will be a local dirpath, as those are the container names when created
@@ -33,9 +42,13 @@ while getopts "i:l:v:h" opt; do
     esac
 done
 
+# allow for tab-completion
+CONTAINER_IMAGE=$(strip_trailing_slash_if_present $CONTAINER_IMAGE)
+
 # yes this is also dirname which pertains to container name
 if [ -z "$CONTAINER_IMAGE" ] || [ ! -d $CONTAINER_IMAGE ]; then
-    echo "Missing arg for local directory path (container image)"
+    # TODO be nice and spilit these cases each with a seperate message
+    echo "Missing or invalid arg for local directory path (container image)"
     usage
     exit 1
 fi
@@ -61,19 +74,15 @@ echo "Using '$CONTAINER_CMD'.."
 # determine if there exist a container built with this image name
 EXISTS=$($CONTAINER_CMD images --format "{{.Repository}}" | grep $CONTAINER_IMAGE)
 
-if [ -z $EXISTS ]; then
+if [ ${#EXISTS[@]} -eq 0 ]; then
     echo "No container image found for '$CONTAINER_IMAGE'"
     exit 1
 fi
 
 echo "Using container image '$CONTAINER_IMAGE'; mounting local path '$LOCAL_DIR_PATH' at '$VOLUME_MOUNT'"
 
-# Remove the leading `/`, if present
-if [[ $VOLUME_MOUNT == /* ]]; then
-    CLEAN_VOLUME_MOUNT=$(echo "$VOLUME_MOUNT" | cut -c 2-)
-else
-    CLEAN_VOLUME_MOUNT=$VOLUME_MOUNT
-fi
+# as above
+CLEAN_VOLUME_MOUNT=$(strip_trailing_slash_if_present $VOLUME_MOUNT)
 
 # TODO add arg to change this.
 COMMAND=/bin/bash
