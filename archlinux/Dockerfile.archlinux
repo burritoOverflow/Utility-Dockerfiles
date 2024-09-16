@@ -1,0 +1,11 @@
+FROM archlinux:base-devel
+
+# List installed
+RUN pacman -Q
+
+# update
+RUN pacman -Syu --noconfirm
+
+RUN pacman -S --noconfirm zsh neovim vim git cmake ninja gn yt-dlp pyenv
+
+CMD ["uname", "-a"]
