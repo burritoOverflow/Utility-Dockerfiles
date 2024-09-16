@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set -x
-
 does_exist() {
     command -v "$1" >/dev/null 2>&1
 }
@@ -58,7 +56,7 @@ else
     exit 1
 fi
 
-echo 'Using '$CONTAINER_CMD'..'
+echo "Using '$CONTAINER_CMD'.."
 
 # determine if there exist a container built with this image name
 EXISTS=$($CONTAINER_CMD images --format "{{.Repository}}" | grep $CONTAINER_IMAGE)
