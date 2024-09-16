@@ -45,8 +45,8 @@ done
 # allow for tab-completion
 CONTAINER_IMAGE=$(strip_trailing_slash_if_present $CONTAINER_IMAGE)
 
-# yes this is also dirname which pertains to container name
-if [ -z "$CONTAINER_IMAGE" ] || [ ! -d $CONTAINER_IMAGE ]; then
+# As mentioned above, this is dirname which pertains to container name
+if [ -z "$CONTAINER_IMAGE" ] || [ ! -d "$CONTAINER_IMAGE" ]; then
     # TODO be nice and spilit these cases each with a seperate message
     echo "Missing or invalid arg for local directory path (container image)"
     usage
