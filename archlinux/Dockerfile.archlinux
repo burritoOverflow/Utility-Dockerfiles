@@ -1,3 +1,5 @@
+# there are loads of things installed here which may be excessive for a quick use
+# many cases where rebuilding the image while iterating on this fail; use the `force` argument for the build script to pass `--no-cache` to docker|podman build.
 FROM archlinux:base-devel
 
 RUN pacman -Q
@@ -5,7 +7,7 @@ RUN pacman -Q
 RUN pacman -Syu --noconfirm
 
 # all sorts of fun and rice.
-RUN pacman -S --noconfirm curl zsh neovim vim git cmake ninja gn yt-dlp pyenv fish fastfetch zoxide bat ripgrep fzf ffmpeg
+RUN pacman -S --noconfirm curl tree zsh neovim emacs vim git clang cmake ninja gn yt-dlp pyenv fish fastfetch zoxide bat ripgrep fzf ffmpeg
 
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
@@ -23,4 +25,11 @@ RUN fish omfinstall --path=~/.local/share/omf --config=~/.config/omf --nonintera
 
 RUN rm omfinstall
 
-CMD ["uname", "-a"]
+# see LazyVim docs: https://www.lazyvim.org/installation (ignoring the backup creation considering it's a container)
+RUN git clone https://github.com/LazyVim/starter ~/.config/nvim
+
+RUN rm -rf ~/.config/nvim/.git
+
+# clone Spacemacs (replace default configuration)
+# Using docs at: https://wiki.archlinux.org/title/Spacemacs
+RUN git clone https://github.com/syl20bnr/spacemacs ~/.emacs.d

@@ -6,8 +6,8 @@ does_exist() {
     command -v "$1" >/dev/null 2>&1
 }
 
-if [ "$#" -ne 1 ]; then
-    echo "Usage: $0 <directory-containing-dockerfile>"
+if [ $# -eq 0 ]; then
+    echo "Usage: $0 <directory-containing-dockerfile> <force?>"
     exit 1
 fi
 
@@ -43,7 +43,14 @@ IMAGE_TAG="$(basename "$DIRECTORY")"
 
 echo "Building Docker image '$IMAGE_TAG' from Dockerfile in '$DIRECTORY'"
 
-$CONTAINER_CMD build -t "$IMAGE_TAG" -f "$DOCKERFILE" "$DIRECTORY"
+# if flag set to "force" ignore the cache when building the image
+MAYBEFORCE=
+
+if [ ! -z "$2" ] && [ "$2" == "force" ]; then
+    MAYBEFORCE="--no-cache"
+fi
+
+$CONTAINER_CMD build $MAYBEFORCE -t "$IMAGE_TAG" -f "$DOCKERFILE" "$DIRECTORY"
 
 if [ $? -eq 0 ]; then
     echo "Docker image '$IMAGE_TAG' built successfully"

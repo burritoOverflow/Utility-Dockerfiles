@@ -36,5 +36,3 @@ COPY pyenvBinsToPath.sh addbins.sh
 # this is pointless here apparently, but i'll leave it for reference
 # need to source this to change the PATH when running the container manually
 CMD source addbins.sh
-
-CMD ["uname", "-a"]
