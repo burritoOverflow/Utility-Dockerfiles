@@ -11,12 +11,15 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 
-if does_exist podman; then
+# fallback to podman or docker if buildah not found
+if does_exist buildah; then
+    CONTAINER_CMD="buildah"
+    elif does_exist podman; then
     CONTAINER_CMD="podman"
-elif does_exist docker; then
+    elif does_exist docker; then
     CONTAINER_CMD="docker"
 else
-    echo "Requires either Podman or Docker; neither found"
+    echo "Requires either Buildah, Podman, or Docker; none found"
     exit 1
 fi
 
@@ -50,7 +53,12 @@ if [ ! -z "$2" ] && [ "$2" == "force" ]; then
     MAYBEFORCE="--no-cache"
 fi
 
-$CONTAINER_CMD build $MAYBEFORCE -t "$IMAGE_TAG" -f "$DOCKERFILE" "$DIRECTORY"
+BUILD_SUBCOMMAND="build"
+if [ "$CONTAINER_CMD" == "buildah" ]; then
+    BUILD_SUBCOMMAND="bud"
+fi
+
+$CONTAINER_CMD "$BUILD_SUBCOMMAND" $MAYBEFORCE -t "$IMAGE_TAG" -f "$DOCKERFILE" "$DIRECTORY"
 
 if [ $? -eq 0 ]; then
     echo "Docker image '$IMAGE_TAG' built successfully"

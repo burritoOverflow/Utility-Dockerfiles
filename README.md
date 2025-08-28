@@ -1,6 +1,6 @@
 An assortment of `Dockerfiles`
 
-Build a Dockerfile via `Podman` using `buildimage.sh` at root with the directory containing the `Dockerfile` as argv[1], i.e:
+Build a Dockerfile via `Buildah`/`Podman` using `buildimage.sh` at root with the directory containing the `Dockerfile` as argv[1], i.e:
 
 ```bash
 ./buildimage.sh ubuntu24
