@@ -42,7 +42,9 @@ else
 fi
 
 # we'll just use the dirname as the image name
-IMAGE_TAG="$(basename "$DIRECTORY")"
+IMAGE_NAME="$(basename "$DIRECTORY")"
+BUILD_DATE=$(date +%Y%m%d)
+IMAGE_TAG="${IMAGE_NAME}:${BUILD_DATE}"
 
 echo "Building Docker image '$IMAGE_TAG' from Dockerfile in '$DIRECTORY'"
 

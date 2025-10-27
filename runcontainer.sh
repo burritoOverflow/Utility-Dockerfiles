@@ -71,12 +71,14 @@ fi
 
 echo "Using '$CONTAINER_CMD'.."
 
-# determine if there exist a container built with this image name
-EXISTS=$($CONTAINER_CMD images --format "{{.Repository}}" | grep $CONTAINER_IMAGE)
-
-if [ ${#EXISTS[@]} -eq 0 ]; then
+# Find the full image name, prioritizing the 'localhost' version
+FULL_IMAGE_NAME=$($CONTAINER_CMD images --filter "reference=localhost/$CONTAINER_IMAGE" --format "{{.Repository}}:{{.Tag}}" | head -n 1)
+if [ -z "$FULL_IMAGE_NAME" ]; then
     echo "No container image found for '$CONTAINER_IMAGE'"
     exit 1
+else
+    echo "Using container image '$FULL_IMAGE_NAME'"
+    CONTAINER_IMAGE=$FULL_IMAGE_NAME
 fi
 
 echo "Using container image '$CONTAINER_IMAGE'; mounting local path '$LOCAL_DIR_PATH' at '$VOLUME_MOUNT'"
@@ -86,4 +88,4 @@ CLEAN_VOLUME_MOUNT=$(strip_trailing_slash_if_present $VOLUME_MOUNT)
 
 # TODO add arg to change this.
 COMMAND=/bin/bash
-$CONTAINER_CMD run -it -v $LOCAL_DIR_PATH:/$CLEAN_VOLUME_MOUNT $CONTAINER_IMAGE $COMMAND
+$CONTAINER_CMD run -it -v $LOCAL_DIR_PATH:/$CLEAN_VOLUME_MOUNT:z $CONTAINER_IMAGE $COMMAND
