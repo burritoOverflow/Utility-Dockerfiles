@@ -49,10 +49,9 @@ IMAGE_TAG="${IMAGE_NAME}:${BUILD_DATE}"
 echo "Building Docker image '$IMAGE_TAG' from Dockerfile in '$DIRECTORY'"
 
 # if flag set to "force" ignore the cache when building the image
-MAYBEFORCE=
-
+declare -a build_opts=()
 if [ ! -z "$2" ] && [ "$2" == "force" ]; then
-    MAYBEFORCE="--no-cache"
+    build_opts+=(--no-cache)
 fi
 
 BUILD_SUBCOMMAND="build"
@@ -60,7 +59,7 @@ if [ "$CONTAINER_CMD" == "buildah" ]; then
     BUILD_SUBCOMMAND="bud"
 fi
 
-$CONTAINER_CMD "$BUILD_SUBCOMMAND" $MAYBEFORCE -t "$IMAGE_TAG" -f "$DOCKERFILE" "$DIRECTORY"
+$CONTAINER_CMD "$BUILD_SUBCOMMAND" "${build_opts[@]}" -t "$IMAGE_TAG" -f "$DOCKERFILE" "$DIRECTORY"
 
 if [ $? -eq 0 ]; then
     echo "Docker image '$IMAGE_TAG' built successfully"
